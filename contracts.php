@@ -11,7 +11,6 @@ $contracts = $db->query("SELECT * FROM contracts ORDER BY id DESC")->fetchAll(PD
 <?php if (isset($_SESSION['user_id'])): ?>
 <div class="page-layout">
 
-    <!-- Same Quick Menu -->
     <div class="side-menu">
         <div class="side-header">Quick Menu</div>
         <?php if (in_array($_SESSION['role'] ?? '', ['officer', 'admin'])): ?>
@@ -57,7 +56,7 @@ $contracts = $db->query("SELECT * FROM contracts ORDER BY id DESC")->fetchAll(PD
                         <td><?= ucfirst($c['status']) ?></td>
                         <td>
                             <?php if (strtolower($c['status']) === 'open'): ?>
-                                <a href="apply-contract.php?id=<?= $c['id'] ?>" class="btn-apply">Apply</a>
+                                <a href="apply-contract.php?id=<?= $c['id'] ?>" class="btn-apply" style="padding:6px 12px; background:#2e7d32; color:white; text-decoration:none; border-radius:4px; font-weight:600;">Apply</a>
                             <?php else: ?>
                                 -
                             <?php endif; ?>
@@ -71,7 +70,6 @@ $contracts = $db->query("SELECT * FROM contracts ORDER BY id DESC")->fetchAll(PD
 </div>
 
 <?php else: ?>
-<!-- Not logged in -->
 <h1>Contract Farming</h1>
 <table>
     <thead>
@@ -96,7 +94,7 @@ $contracts = $db->query("SELECT * FROM contracts ORDER BY id DESC")->fetchAll(PD
             <td><?= ucfirst($c['status']) ?></td>
             <td>
                 <?php if (strtolower($c['status']) === 'open'): ?>
-                    <a href="login.php" class="btn-apply">Login to Apply</a>
+                    <a href="apply-contract.php?id=<?= $c['id'] ?>" class="btn-apply" style="padding:6px 12px; background:#2e7d32; color:white; text-decoration:none; border-radius:4px; font-weight:600;">Apply</a>
                 <?php else: ?>
                     -
                 <?php endif; ?>

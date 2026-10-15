@@ -1,13 +1,10 @@
 <?php
-// config.php - Database connection + start session
-
 session_start();
 
 try {
     $db = new PDO('sqlite:' . __DIR__ . '/database.sqlite');
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Create tables if they don't exist
     $db->exec("
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -65,7 +62,6 @@ try {
         );
     ");
 
-    // Insert sample data only if tables are empty
     $count = $db->query("SELECT COUNT(*) FROM market_prices")->fetchColumn();
     if ($count == 0) {
         $db->exec("
@@ -86,10 +82,10 @@ try {
             ('ADMARC', 'Maize', 10000, 4800000, '2026-08-20', 'Government maize purchase programme');
 
             INSERT INTO outside_markets (company, crop, quantity, amount_mk, location, contact) VALUES
-            ('Bakhresa Grain Milling', 'Maize', 8000, 3800000, 'Blantyre', '0888 123 456'),
-            ('Sunseed Oil', 'Groundnuts', 2500, 2600000, 'Lilongwe', '0999 987 654'),
-            ('Rab Processors', 'Soybean', 4000, 5100000, 'Blantyre', '0881 222 333'),
-            ('Transglobe Produce', 'Beans', 1500, 1950000, 'Lilongwe', '0992 444 555');
+            ('Bakhresa Grain Milling', 'Maize', 8000, 3800000, 'Blantyre', '0888123456'),
+            ('Sunseed Oil', 'Groundnuts', 2500, 2600000, 'Lilongwe', '0999987654'),
+            ('Rab Processors', 'Soybean', 4000, 5100000, 'Blantyre', '0881222333'),
+            ('Transglobe Produce', 'Beans', 1500, 1950000, 'Lilongwe', '0992444555');
 
             INSERT INTO trending_crops (crop, reason, demand_level) VALUES
             ('Soybean', 'High export demand and good prices', 'Very High'),

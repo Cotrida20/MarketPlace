@@ -8,7 +8,7 @@ require 'includes/header.php';
 $role = $_SESSION['role'] ?? 'farmer';
 
 $gov_prices = $db->query("SELECT crop, price_per_kg, location, '' AS contact, 'Government' AS source 
-                          FROM market_prices ORDER BY crop")->fetchAll(PDO::FETCH_ASSOC);
+                         FROM market_prices ORDER BY crop")->fetchAll(PDO::FETCH_ASSOC);
 
 $buyer_prices = $db->query("SELECT crop, ROUND(amount_mk / quantity, 0) AS price_per_kg, 
                                    location, contact, 'Buyer Offer' AS source
@@ -41,7 +41,47 @@ $all_prices = array_merge($gov_prices, $buyer_prices);
     </div>
 
     <div class="main-content">
-        <h1>Market Prices</h1>
+        <h1>Market Prices & Gross Margin Calculator</h1>
+
+        <?php if ($role === 'farmer'): ?>
+        <div class="form-box" style="background:#f1f8e9; margin-bottom:30px; padding:20px; border-radius:8px;">
+            <h3>Farmer Gross Margin Calculator</h3>
+            <p style="font-size:0.9rem; color:#555;">Calculate your estimated profit per acre based on market prices and your input costs.</p>
+            <form id="margin-calc" onsubmit="return false;" style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:15px;">
+                <div>
+                    <label>Select Crop</label>
+                    <select id="calc_crop" style="width:100%; padding:8px;" onchange="updateDefaultPrice()">
+                        <?php foreach ($all_prices as $p): ?>
+                            <option value="<?= $p['price_per_kg'] ?>"><?= htmlspecialchars($p['crop']) ?> (MK <?= number_format($p['price_per_kg'], 0) ?>/kg)</option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div>
+                    <label>Expected Yield per Acre (kg)</label>
+                    <input type="number" id="calc_yield" value="1000" style="width:100%; padding:8px;" min="1">
+                </div>
+                <div>
+                    <label>Total Variable Costs per Acre (MK)</label>
+                    <input type="number" id="calc_costs" value="150000" style="width:100%; padding:8px;" min="0">
+                </div>
+                <div style="display:flex; align-items:flex-end;">
+                    <button type="button" class="btn" onclick="calculateMargin()" style="width:100%; padding:10px;">Calculate Gross Margin</button>
+                </div>
+            </form>
+            <div id="calc_result" style="margin-top:15px; font-weight:bold; font-size:1.1rem; color:#1b5e20;"></div>
+        </div>
+        <script>
+        function calculateMargin() {
+            var price = parseFloat(document.getElementById('calc_crop').value) || 0;
+            var yieldKg = parseFloat(document.getElementById('calc_yield').value) || 0;
+            var costs = parseFloat(document.getElementById('calc_costs').value) || 0;
+            var revenue = price * yieldKg;
+            var margin = revenue - costs;
+            document.getElementById('calc_result').innerHTML = 'Estimated Total Revenue: MK ' + revenue.toLocaleString() + '<br>Estimated Gross Margin (Profit): MK ' + margin.toLocaleString();
+        }
+        </script>
+        <?php endif; ?>
+
         <table>
             <thead>
                 <tr>

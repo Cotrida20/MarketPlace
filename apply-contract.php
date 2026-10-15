@@ -34,12 +34,12 @@ $db->exec("CREATE TABLE IF NOT EXISTS applications (
 )");
 
 if (isset($_POST['apply'])) {
-    $full_name   = trim($_POST['full_name'] ?? '');
+    $full_name = trim($_POST['full_name'] ?? '');
     $national_id = strtoupper(trim($_POST['national_id'] ?? ''));
-    $phone       = trim($_POST['phone'] ?? '');
-    $location    = trim($_POST['location'] ?? '');
-    $quantity    = (int)($_POST['quantity'] ?? 0);
-    $notes       = trim($_POST['notes'] ?? '');
+    $phone = preg_replace('/\D/', '', $_POST['phone'] ?? '');
+    $location = trim($_POST['location'] ?? '');
+    $quantity = (int)($_POST['quantity'] ?? 0);
+    $notes = trim($_POST['notes'] ?? '');
 
     if ($full_name === '') {
         $error = "Full name is required.";
@@ -47,10 +47,8 @@ if (isset($_POST['apply'])) {
         $error = "Malawian National ID number is required.";
     } elseif (!preg_match('/^[A-Z0-9]{8,13}$/', $national_id)) {
         $error = "Invalid National ID format. Use 8 to 13 letters and numbers only.";
-    } elseif (preg_match('/^(0+|1+|12345678|87654321|00000000|11111111)$/', $national_id)) {
-        $error = "That National ID number is not valid. Please enter your real Malawian National ID.";
-    } elseif ($phone === '' || strlen(preg_replace('/\D/', '', $phone)) < 9) {
-        $error = "Enter a valid Malawian phone number.";
+    } elseif (strlen($phone) !== 10) {
+        $error = "Phone number must be exactly 10 digits.";
     } elseif ($location === '') {
         $error = "Your location or district is required.";
     } elseif ($quantity > 0 && $quantity > $contract['quantity']) {
@@ -310,9 +308,10 @@ require 'includes/header.php';
                     </div>
 
                     <div class="form-row">
-                        <label>Phone Number</label>
+                        <label>Phone Number (10 digits)</label>
                         <input type="text" name="phone" 
-                               value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>" required>
+                               value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>" 
+                               maxlength="10" pattern="[0-9]{10}" placeholder="0888123456" required>
                     </div>
 
                     <div class="form-row">

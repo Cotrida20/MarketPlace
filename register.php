@@ -6,9 +6,9 @@ $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $fullname = trim($_POST['fullname'] ?? '');
-    $phone    = preg_replace('/\D/', '', $_POST['phone'] ?? '');   // keep digits only
+    $phone = preg_replace('/\D/', '', $_POST['phone'] ?? '');
     $password = $_POST['password'] ?? '';
-    $role     = $_POST['role'] ?? 'farmer';
+    $role = $_POST['role'] ?? 'farmer';
 
     if ($fullname === '' || $phone === '' || $password === '') {
         $error = "All fields are required.";
