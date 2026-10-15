@@ -8,69 +8,6 @@ require 'includes/header.php';
 $contracts = $db->query("SELECT * FROM contracts ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-<style>
-.page-layout {
-    display: flex;
-    gap: 20px;
-    margin-top: 20px;
-    align-items: flex-start;
-}
-.side-menu {
-    width: 230px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    border-top: 5px solid #2e7d32;
-    position: sticky;
-    top: 20px;
-}
-.side-menu .side-header {
-    background: #1b5e20;
-    color: white;
-    padding: 15px 18px;
-    font-weight: 600;
-}
-.side-menu a {
-    display: block;
-    padding: 12px 18px;
-    color: #333;
-    text-decoration: none;
-    border-bottom: 1px solid #f0f0f0;
-}
-.side-menu a:hover,
-.side-menu a.active {
-    background: #e8f5e9;
-    color: #1b5e20;
-    font-weight: 500;
-}
-.main-content {
-    flex: 1;
-    background: white;
-    border-radius: 12px;
-    padding: 25px 30px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    border-top: 5px solid #8bc34a;
-}
-.main-content h1 {
-    margin-top: 0;
-    color: #1b5e20;
-}
-.btn-apply {
-    background: #2e7d32;
-    color: white;
-    padding: 7px 14px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-decoration: none;
-    display: inline-block;
-}
-.btn-apply:hover {
-    background: #1b5e20;
-    color: white;
-}
-</style>
-
 <?php if (isset($_SESSION['user_id'])): ?>
 <div class="page-layout">
 

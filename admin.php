@@ -47,66 +47,6 @@ $hide_main_nav = true;
 require 'includes/header.php';
 ?>
 
-<style>
-.page-layout {
-    display: flex;
-    gap: 20px;
-    margin-top: 20px;
-    align-items: flex-start;
-}
-.side-menu {
-    width: 230px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    border-top: 5px solid #2e7d32;
-    position: sticky;
-    top: 20px;
-    overflow: hidden;
-}
-.side-menu .side-header {
-    background: #1b5e20;
-    color: white;
-    padding: 15px 18px;
-    font-weight: 600;
-}
-.side-menu a {
-    display: block;
-    padding: 12px 18px;
-    color: #333;
-    text-decoration: none;
-    border-bottom: 1px solid #f0f0f0;
-    font-size: 0.95rem;
-}
-.side-menu a:hover,
-.side-menu a.active {
-    background: #e8f5e9;
-    color: #1b5e20;
-    font-weight: 500;
-}
-.main-content {
-    flex: 1;
-    background: white;
-    border-radius: 12px;
-    padding: 25px 30px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    border-top: 5px solid #8bc34a;
-}
-.main-content h2 {
-    margin-top: 0;
-    color: #1b5e20;
-}
-.alert-success {
-    background: #e8f5e9;
-    color: #1b5e20;
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    border-left: 5px solid #43a047;
-    font-weight: 500;
-}
-</style>
-
 <div class="page-layout">
 
     <div class="side-menu">
