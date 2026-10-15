@@ -6,12 +6,16 @@ $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $fullname = trim($_POST['fullname'] ?? '');
-    $phone  = trim($_POST['phone'] ?? '');
+    $phone    = preg_replace('/\D/', '', $_POST['phone'] ?? '');   // keep digits only
     $password = $_POST['password'] ?? '';
-    $role = $_POST['role'] ?? 'farmer';
+    $role     = $_POST['role'] ?? 'farmer';
 
-    if (empty($fullname) || empty($phone) || empty($password)) {
+    if ($fullname === '' || $phone === '' || $password === '') {
         $error = "All fields are required.";
+    } elseif (strlen($phone) !== 10) {
+        $error = "Phone number must be exactly 10 digits (for example 0888123456).";
+    } elseif (!in_array($role, ['farmer', 'buyer', 'officer'])) {
+        $error = "Please choose a valid account type.";
     } else {
         $hashed = password_hash($password, PASSWORD_DEFAULT);
         try {
@@ -34,26 +38,31 @@ require 'includes/header.php';
     <?php if ($success): ?><div class="alert alert-success"><?= htmlspecialchars($success) ?></div><?php endif; ?>
 
     <form method="POST">
-        <label>Full Name</label>
-        <input type="text" name="fullname" required placeholder="Enter your full name">
+        <label for="fullname">Full Name</label>
+        <input type="text" id="fullname" name="fullname" required placeholder="Enter your full name"
+               value="<?= htmlspecialchars($_POST['fullname'] ?? '') ?>">
 
-        <label>Phone Number</label>
-        <input type="text" name="phone" placeholder="0888 123 456" required>
+        <label for="phone">Phone Number (10 digits)</label>
+        <input type="tel" id="phone" name="phone" required placeholder="0888123456"
+               inputmode="numeric" pattern="[0-9]{10}" maxlength="10" minlength="10"
+               title="Enter exactly 10 digits, numbers only"
+               oninput="this.value=this.value.replace(/\D/g,'')"
+               value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>">
 
-        <label>I am a:</label>
-        <select name="role" required style="width:100%; padding:12px; margin:8px 0 18px; border:1.5px solid #a5d6a7; border-radius:7px;">
+        <label for="role">I am a:</label>
+        <select id="role" name="role" required>
             <option value="farmer">Farmer</option>
             <option value="buyer">Buyer / Trader</option>
             <option value="officer">Agricultural Extension Officer</option>
         </select>
 
-        <label>Password</label>
-        <input type="password" name="password" required placeholder="Create a password">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required placeholder="Create a password">
 
-        <button type="submit" class="btn" style="width:100%">Register</button>
+        <button type="submit" class="btn btn-primary">Register</button>
     </form>
     <p style="margin-top:18px; text-align:center;">
-        Already have an account? <a href="login.php" style="color:#2e7d32; font-weight:600;">Login here</a>
+        Already have an account? <a href="login.php" style="font-weight:600;">Login here</a>
     </p>
 </div>
 
