@@ -7,14 +7,14 @@ $search = trim($_GET['q'] ?? '');
 $search_results = [];
 
 if ($search !== '') {
-    $stmt = $db->prepare("SELECT crop, price_per_kg, location, 'Government' AS source 
+    $stmt = $db->prepare("SELECT crop, price_per_kg, location, '' AS contact, 'Government' AS source 
                           FROM market_prices 
                           WHERE crop LIKE ? 
                           ORDER BY crop");
     $stmt->execute(['%' . $search . '%']);
     $gov = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $stmt2 = $db->prepare("SELECT crop, ROUND(amount_mk / quantity, 0) AS price_per_kg, location, 'Buyer Offer' AS source 
+    $stmt2 = $db->prepare("SELECT crop, ROUND(amount_mk / quantity, 0) AS price_per_kg, location, contact, 'Buyer Offer' AS source 
                            FROM outside_markets 
                            WHERE crop LIKE ? 
                            ORDER BY crop");
@@ -60,7 +60,6 @@ if ($search !== '') {
     border: 2px solid white;
 }
 
-/* Search box */
 .search-box {
     background: white;
     border-radius: 14px;
@@ -137,14 +136,13 @@ if ($search !== '') {
 
 <div class="hero">
     <h1>Agricultural Market Price Tracker</h1>
-    <p>Accurate, timely market prices for smallholder farmers in Malawi – especially Lunzu, Blantyre</p>
+    <p>Accurate, timely market prices for smallholder farmers in Malawi — especially Lunzu, Blantyre</p>
     <div class="hero-buttons">
         <a href="market-prices.php" class="btn btn-light">View Current Prices</a>
         <a href="contracts.php" class="btn btn-outline-light">See Contract Farming</a>
     </div>
 </div>
 
-<!-- PRICE SEARCH -->
 <div class="search-box">
     <h2>Search Crop Prices</h2>
     <form class="search-form" method="GET" action="index.php">
@@ -156,7 +154,7 @@ if ($search !== '') {
     <?php if ($search !== ''): ?>
     <div class="search-results">
         <?php if (empty($search_results)): ?>
-            <p>No prices found for “<?= htmlspecialchars($search) ?>”.</p>
+            <p>No prices found for "<?= htmlspecialchars($search) ?>".</p>
         <?php else: ?>
             <table>
                 <thead>
@@ -164,6 +162,7 @@ if ($search !== '') {
                         <th>Crop</th>
                         <th>Price (MK / kg)</th>
                         <th>Location</th>
+                        <th>Phone Number</th>
                         <th>Source</th>
                     </tr>
                 </thead>
@@ -173,6 +172,7 @@ if ($search !== '') {
                         <td><strong><?= htmlspecialchars($r['crop']) ?></strong></td>
                         <td class="price">MK <?= number_format($r['price_per_kg'], 0) ?></td>
                         <td><?= htmlspecialchars($r['location'] ?? '-') ?></td>
+                        <td><?= !empty($r['contact']) ? htmlspecialchars($r['contact']) : '-' ?></td>
                         <td><?= htmlspecialchars($r['source']) ?></td>
                     </tr>
                     <?php endforeach; ?>

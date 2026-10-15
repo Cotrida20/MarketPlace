@@ -4,7 +4,7 @@ require 'config.php';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $phone    = preg_replace('/\D/', '', $_POST['phone'] ?? '');
+    $phone = preg_replace('/\D/', '', $_POST['phone'] ?? '');
     $password = $_POST['password'] ?? '';
 
     if (strlen($phone) !== 10) {

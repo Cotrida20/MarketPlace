@@ -34,17 +34,27 @@ if (isset($_POST['add_admin'])) {
     $password = $_POST['password'] ?? '';
 
     if ($fullname === '' || strlen($phone) !== 10 || $password === '') {
-        $message = "Error: All fields are required and phone must be 10 digits.";
+        $message = "Error: All fields are required and phone must be exactly 10 digits.";
         $section = 'admins';
     } else {
         $hashed = password_hash($password, PASSWORD_DEFAULT);
         try {
-            $stmt = $db->prepare("INSERT INTO users (fullname, phone, password, role) VALUES (?, ?, ?, 'admin')");
-            $stmt->execute([$fullname, $phone, $hashed]);
+            $check = $db->prepare("SELECT id FROM users WHERE phone = ?");
+            $check->execute([$phone]);
+            $existing = $check->fetch();
+
+            if ($existing) {
+                $stmt = $db->prepare("UPDATE users SET fullname = ?, password = ?, role = 'admin' WHERE phone = ?");
+                $stmt->execute([$fullname, $hashed, $phone]);
+            } else {
+                $stmt = $db->prepare("INSERT INTO users (fullname, phone, password, role) VALUES (?, ?, ?, 'admin')");
+                $stmt->execute([$fullname, $phone, $hashed]);
+            }
+
             header("Location: admin.php?section=admins&added=1");
             exit;
         } catch (PDOException $e) {
-            $message = "Error: Phone number already registered.";
+            $message = "Error: Database issue creating admin account.";
             $section = 'admins';
         }
     }
@@ -58,7 +68,7 @@ if (isset($_GET['ok']) && $_GET['ok'] == 1) {
 }
 
 if (isset($_GET['added']) && $_GET['added'] == 1) {
-    $message = "New admin account has been created successfully.";
+    $message = "Admin account saved successfully and ready for login.";
     $section = 'admins';
 }
 
@@ -160,7 +170,7 @@ require 'includes/header.php';
             <h2>Manage Admins & Officers</h2>
             
             <div class="form-box" style="margin-bottom:30px; background:#fff; padding:20px; border-radius:8px;">
-                <h3>Add New Admin / Officer</h3>
+                <h3>Add or Update Admin Account</h3>
                 <form method="POST">
                     <label>Full Name</label>
                     <input type="text" name="fullname" required style="width:100%; padding:8px; margin-bottom:10px;">
@@ -171,7 +181,7 @@ require 'includes/header.php';
                     <label>Password</label>
                     <input type="password" name="password" required style="width:100%; padding:8px; margin-bottom:15px;">
 
-                    <button type="submit" name="add_admin" class="btn">Create Admin Account</button>
+                    <button type="submit" name="add_admin" class="btn">Save Admin Account</button>
                 </form>
             </div>
 
