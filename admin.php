@@ -14,17 +14,26 @@ if (isset($_POST['update_price'])) {
     $price = (float)$_POST['price'];
 
     if ($id > 0 && $price > 0) {
-        $stmt = $db->prepare("UPDATE market_prices 
-                            SET price_per_kg = ?, updated_at = CURRENT_TIMESTAMP 
-                            WHERE id = ?");
-        $stmt->execute([$price, $id]);
-
-        $cropStmt = $db->prepare("SELECT crop FROM market_prices WHERE id = ?");
+        $cropStmt = $db->prepare("SELECT crop, location FROM market_prices WHERE id = ?");
         $cropStmt->execute([$id]);
-        $cropName = $cropStmt->fetchColumn();
+        $cropRow = $cropStmt->fetch(PDO::FETCH_ASSOC);
 
-        header("Location: admin.php?section=prices&ok=1&crop=" . urlencode($cropName) . "&price=" . $price);
-        exit;
+        if ($cropRow) {
+            $cropName = $cropRow['crop'];
+            $location = $cropRow['location'] ?? 'National (Govt)';
+
+            $stmt = $db->prepare("UPDATE market_prices 
+                                SET price_per_kg = ?, updated_at = CURRENT_TIMESTAMP 
+                                WHERE id = ?");
+            $stmt->execute([$price, $id]);
+
+            $historyStmt = $db->prepare("INSERT INTO market_price_history (crop, price_per_kg, location, updated_at)
+                                        VALUES (?, ?, ?, CURRENT_TIMESTAMP)");
+            $historyStmt->execute([$cropName, $price, $location]);
+
+            header("Location: admin.php?section=prices&ok=1&crop=" . urlencode($cropName) . "&price=" . $price);
+            exit;
+        }
     }
 }
 
@@ -89,6 +98,7 @@ require 'includes/header.php';
         <a href="admin.php?section=prices" class="<?= $section == 'prices' ? 'active' : '' ?>">Manage Prices</a>
         <a href="admin.php?section=contracts" class="<?= $section == 'contracts' ? 'active' : '' ?>">View All Contracts</a>
         <a href="admin.php?section=admins" class="<?= $section == 'admins' ? 'active' : '' ?>">Manage Admins</a>
+        <a href="market-performance.php">Crop Performance</a>
         <a href="buyer-add-price.php">Post Price Offer</a>
         <a href="outside-markets.php">View Buyer Offers</a>
         <a href="market-prices.php">Current Market Prices</a>
@@ -121,7 +131,7 @@ require 'includes/header.php';
                         <td><strong><?= htmlspecialchars($p['crop']) ?></strong></td>
                         <td class="price">MK <?= number_format($p['price_per_kg'], 0) ?></td>
                         <td><?= htmlspecialchars($p['location'] ?? 'National (Govt)') ?></td>
-                        <td><?= date('d M Y', strtotime($p['updated_at'])) ?></td>
+                        <td><?= !empty($p['updated_at']) ? date('d M Y, H:i', strtotime($p['updated_at'])) : 'N/A' ?></td>
                         <td>
                             <form method="POST" style="display:flex; gap:8px; align-items:center;">
                                 <input type="hidden" name="id" value="<?= $p['id'] ?>">
