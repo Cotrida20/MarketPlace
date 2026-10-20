@@ -24,6 +24,14 @@ try {
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
 
+        CREATE TABLE IF NOT EXISTS market_price_history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            crop TEXT NOT NULL,
+            price_per_kg REAL NOT NULL,
+            location TEXT DEFAULT 'National (Govt)',
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
+
         CREATE TABLE IF NOT EXISTS contracts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             company TEXT NOT NULL,
@@ -42,7 +50,8 @@ try {
             quantity INTEGER NOT NULL,
             amount_mk REAL NOT NULL,
             location TEXT,
-            contact TEXT
+            contact TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
 
         CREATE TABLE IF NOT EXISTS trending_crops (
@@ -62,18 +71,50 @@ try {
         );
     ");
 
+    try {
+        $db->exec("ALTER TABLE outside_markets ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP");
+    } catch (PDOException $e) {
+        // Column already exists; ignore.
+    }
+
     $count = $db->query("SELECT COUNT(*) FROM market_prices")->fetchColumn();
     if ($count == 0) {
         $db->exec("
-            INSERT INTO market_prices (crop, price_per_kg) VALUES
-            ('Maize', 450),
-            ('Tobacco', 2800),
-            ('Beans', 1200),
-            ('Groundnuts', 950),
-            ('Rice', 780),
-            ('Soybean', 1100),
-            ('Tomato', 600),
-            ('Onion', 550);
+            INSERT INTO market_prices (crop, price_per_kg, updated_at) VALUES
+            ('Maize', 450, datetime('now','-12 days')),
+            ('Tobacco', 2800, datetime('now','-9 days')),
+            ('Beans', 1200, datetime('now','-8 days')),
+            ('Groundnuts', 950, datetime('now','-7 days')),
+            ('Rice', 780, datetime('now','-6 days')),
+            ('Soybean', 1100, datetime('now','-5 days')),
+            ('Tomato', 600, datetime('now','-4 days')),
+            ('Onion', 550, datetime('now','-3 days'));
+
+            INSERT INTO market_price_history (crop, price_per_kg, location, updated_at) VALUES
+            ('Maize', 420, 'National (Govt)', datetime('now','-12 days')),
+            ('Maize', 440, 'National (Govt)', datetime('now','-9 days')),
+            ('Maize', 450, 'National (Govt)', datetime('now','-3 days')),
+            ('Tobacco', 2600, 'National (Govt)', datetime('now','-10 days')),
+            ('Tobacco', 2700, 'National (Govt)', datetime('now','-6 days')),
+            ('Tobacco', 2800, 'National (Govt)', datetime('now','-2 days')),
+            ('Beans', 1100, 'National (Govt)', datetime('now','-9 days')),
+            ('Beans', 1180, 'National (Govt)', datetime('now','-5 days')),
+            ('Beans', 1200, 'National (Govt)', datetime('now','-1 day')),
+            ('Groundnuts', 900, 'National (Govt)', datetime('now','-11 days')),
+            ('Groundnuts', 920, 'National (Govt)', datetime('now','-6 days')),
+            ('Groundnuts', 950, 'National (Govt)', datetime('now','-2 days')),
+            ('Rice', 720, 'National (Govt)', datetime('now','-12 days')),
+            ('Rice', 760, 'National (Govt)', datetime('now','-7 days')),
+            ('Rice', 780, 'National (Govt)', datetime('now','-1 day')),
+            ('Soybean', 1000, 'National (Govt)', datetime('now','-10 days')),
+            ('Soybean', 1050, 'National (Govt)', datetime('now','-5 days')),
+            ('Soybean', 1100, 'National (Govt)', datetime('now','-1 day')),
+            ('Tomato', 560, 'National (Govt)', datetime('now','-9 days')),
+            ('Tomato', 580, 'National (Govt)', datetime('now','-4 days')),
+            ('Tomato', 600, 'National (Govt)', datetime('now','-1 day')),
+            ('Onion', 500, 'National (Govt)', datetime('now','-10 days')),
+            ('Onion', 530, 'National (Govt)', datetime('now','-5 days')),
+            ('Onion', 550, 'National (Govt)', datetime('now','-2 days'));
 
             INSERT INTO contracts (company, crop, quantity, amount_mk, deadline, description) VALUES
             ('Illovo Sugar Malawi', 'Sugarcane', 5000, 3500000, '2026-06-30', 'Contract farming for sugarcane - transport provided'),
